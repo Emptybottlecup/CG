@@ -1,21 +1,14 @@
 #include "Game.h"
-
-Game::Game()
+Game::Game() : pWindow(pWidth, pHeight)
 {
-	pWindow = DisplayWin32(pWidth, pHeight);
 	CreateDeviceAndSwapChain();
 	CreateRenderTargetView();
-	pGameComponents.push_back(new TriangleGameComponent(this));
-	CreateInputLayout();
 }
 
-Game::Game(int Width, int Height) : pWidth(Width), pHeight(Height)
+Game::Game(int Width, int Height) : pWidth(Width), pHeight(Height), pWindow(pWidth, pHeight)
 {
-	pWindow = DisplayWin32(pWidth, pHeight);
 	CreateDeviceAndSwapChain();
 	CreateRenderTargetView();
-	pGameComponents.push_back(new TriangleGameComponent(this));
-	CreateInputLayout();
 }
 
 void Game::CreateDeviceAndSwapChain()
@@ -31,7 +24,7 @@ void Game::CreateDeviceAndSwapChain()
 	swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapDesc.OutputWindow = *pWindow.GetWindow();
+	swapDesc.OutputWindow = pWindow.GetWindow();
 	swapDesc.Windowed = true;
 	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapDesc.Flags = 0;
@@ -51,12 +44,17 @@ void Game::CreateDeviceAndSwapChain()
 		&pDevice,
 		nullptr,
 		&pDeviceContext);
+
 	if (FAILED(res))
 	{
 		// Well, that was unexpected
 	}
 }
 
+void Game::PushGameComponents(GameComponent* newGameComponent)
+{
+	pGameComponents.push_back(newGameComponent);
+}
 void Game::CreateRenderTargetView()
 {
 	ID3D11Texture2D* colorBuffer;
@@ -85,7 +83,7 @@ void Game::CreateInputLayout()
 		0}
 	};
 
-	pDevice->CreateInputLayout(inputElements, 1, pGameComponents[0]->GetVertexShaderBlob()->GetBufferPointer(), pGameComponents[0]->GetVertexShaderBlob()->GetBufferSize(), &pInputLayout);
+	pDevice->CreateInputLayout(inputElements, 1, pGameComponents[0]->GetVertexShaderByteCode()->GetBufferPointer(), pGameComponents[0]->GetVertexShaderByteCode()->GetBufferSize(), &pInputLayout);
 }
 
 Microsoft::WRL::ComPtr<ID3D11Device> Game::GetDevice()
@@ -100,13 +98,9 @@ Microsoft::WRL::ComPtr<ID3D11DeviceContext> Game::GetDeviceContext()
 
 void Game::Run()
 {
+	CreateInputLayout();
 	MSG msg = {};
 	bool isExitRequested = false;
-
-	for (auto object : pGameComponents)
-	{
-		object->Initialize();
-	}
 
 	while (!isExitRequested) {
 		// Handle the windows messages.
@@ -145,6 +139,7 @@ void Game::Run()
 
 		for (auto object : pGameComponents)
 		{
+			object->Initialize();
 			object->Draw();
 		}
 

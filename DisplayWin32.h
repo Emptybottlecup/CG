@@ -15,9 +15,9 @@ public:
 
 	int GetWidth();
 
-	HWND* GetWindow()
+	HWND& GetWindow()
 	{
-		return &phWnd;
+		return phWnd;
 	}
 
 	void Release();

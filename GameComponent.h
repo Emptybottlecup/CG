@@ -10,27 +10,36 @@ public:
 	virtual void Initialize() = 0;
 	virtual void Draw() = 0;
 	virtual void CreateShaders() = 0;
+	virtual void DestroyResources() = 0;
+	virtual void Reload() = 0;
+	virtual void Update() = 0;
 
 	virtual Microsoft::WRL::ComPtr<ID3D11VertexShader>& GetVertexShader() = 0;
 
 	virtual Microsoft::WRL::ComPtr<ID3D11PixelShader>& GetPixelShader() = 0;
 
-	virtual Microsoft::WRL::ComPtr<ID3DBlob>& GetVertexShaderBlob() = 0;
+	virtual Microsoft::WRL::ComPtr<ID3DBlob>& GetVertexShaderByteCode() = 0;
 
-	virtual Microsoft::WRL::ComPtr<ID3DBlob>& GetPixelShaderBlob() = 0;
+	virtual Microsoft::WRL::ComPtr<ID3DBlob>& GetPixelShaderByteCode() = 0;
 };
 
 class TriangleGameComponent : public GameComponent
 {
 public:
 
-	TriangleGameComponent(Game* GameObject);
+	TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT3> points, std::vector<int> indices);
 
 	void Initialize();
 
 	void CreateShaders();
 
 	void Draw();
+
+	void Reload();
+
+	void Update();
+
+	void DestroyResources();
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>& GetVertexShader()
 	{
@@ -42,26 +51,23 @@ public:
 		return pPixelShader;
 	}
 
-	Microsoft::WRL::ComPtr<ID3DBlob>& GetVertexShaderBlob()
+	Microsoft::WRL::ComPtr<ID3DBlob>& GetVertexShaderByteCode()
 	{
-		return pVertexShaderBlob;
+		return pVertexShaderByteCode;
 	}
 
-	Microsoft::WRL::ComPtr<ID3DBlob>& GetPixelShaderBlob()
+	Microsoft::WRL::ComPtr<ID3DBlob>& GetPixelShaderByteCode()
 	{
-		return pPixelShaderBlob;
+		return pPixelShaderByteCode;
 	}
 
 private:
+	std::vector<DirectX::XMFLOAT3> pPoints;
+	std::vector<int> pIndices;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-	Microsoft::WRL::ComPtr<ID3DBlob> pVertexShaderBlob;
-	Microsoft::WRL::ComPtr<ID3DBlob> pPixelShaderBlob;
-	D3D11_BUFFER_DESC vertexBufDesc;
-	D3D11_SUBRESOURCE_DATA vertexData;
-	ID3D11Buffer* vb;
-	D3D11_BUFFER_DESC indexBufDesc;
-	D3D11_SUBRESOURCE_DATA indexData;
-	ID3D11Buffer* ib;
+	Microsoft::WRL::ComPtr<ID3DBlob> pVertexShaderByteCode;
+	Microsoft::WRL::ComPtr<ID3DBlob> pPixelShaderByteCode;
 	Game* pGame;
 };
+

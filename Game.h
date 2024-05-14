@@ -32,6 +32,8 @@ public:
 
 	void CreateInputLayout();
 
+	void PushGameComponents(GameComponent* newGameComponent);
+
 	Microsoft::WRL::ComPtr<ID3D11Device> GetDevice();
 
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetDeviceContext();
