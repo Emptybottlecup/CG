@@ -40,6 +40,8 @@ public:
 
 	void Run();
 
+	void DeleteResources();
+
 private:
 	int pWidth = 800;
 	int pHeight = 800;

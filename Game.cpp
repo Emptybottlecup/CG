@@ -59,15 +59,7 @@ void Game::CreateRenderTargetView()
 {
 	ID3D11Texture2D* colorBuffer;
 	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&colorBuffer);
-	if (FAILED(pDevice->CreateRenderTargetView(colorBuffer, nullptr, &pRenderTargetView)))
-	{
-		printf("FAILD TO CREATE RTV!!!!\n");
-		abort();
-	}
-	else
-	{
-		printf("CREATE RTV SUCCES\n");
-	}
+	pDevice->CreateRenderTargetView(colorBuffer, nullptr, &pRenderTargetView);
 }
 
 void Game::CreateInputLayout()
@@ -145,4 +137,9 @@ void Game::Run()
 
 		pSwapChain->Present(1, 0);
 	}
+}
+
+void Game::DeleteResources()
+{
+
 }
