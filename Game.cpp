@@ -1,18 +1,17 @@
 #include "Game.h"
 #include <iostream>
+#include <chrono>
 
 Game::Game() : pWindow(pWidth, pHeight)
 {
 	pInput = new InputDevice(this);
 	CreateDeviceAndSwapChain();
-	CreateRenderTargetView();
 }
 
 Game::Game(int Width, int Height) : pWidth(Width), pHeight(Height), pWindow(pWidth, pHeight)
 {
 	pInput = new InputDevice(this);
 	CreateDeviceAndSwapChain();
-	CreateRenderTargetView();
 }
 
 void Game::CreateDeviceAndSwapChain()
@@ -88,7 +87,9 @@ void Game::Run()
 {
 	MSG msg = {};
 	bool isExitRequested = false;
-
+	std::chrono::time_point<std::chrono::steady_clock> PrevTime = std::chrono::steady_clock::now();
+	float totalTime = 0;
+	unsigned int frameCount = 0;
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -101,8 +102,18 @@ void Game::Run()
 			isExitRequested = true;
 		}
 
-		float clearColor[] = { 0.5, 0.5, 1, 1 };
+		CreateRenderTargetView();
+
+		float clearColor[] = { totalTime, 0.5, 1, 1 };
 		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clearColor);
+
+		auto	curTime = std::chrono::steady_clock::now();
+		float	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 1000000.0f;
+		PrevTime = curTime;
+
+		totalTime += deltaTime;
+		frameCount++;
+
 
 		pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
 		for (auto object : pGameComponents)
@@ -118,6 +129,19 @@ void Game::Run()
 		{
 			object->Initialize();
 			object->Draw();
+			object->Update();
+		}
+
+		if (totalTime > 1.0f) {
+			float fps = frameCount / totalTime;
+
+			totalTime -= 1.0f;
+
+			WCHAR text[256];
+			swprintf_s(text, TEXT("FPS: %f"), fps);
+			SetWindowText(pWindow.GetWindow(), text);
+
+			frameCount = 0;
 		}
 
 		pSwapChain->Present(1, 0);

@@ -64,6 +64,9 @@ public:
 	}
 
 private:
+	bool dowm_up = true;
+	float first = 0.3f;
+	float second = -0.3f;
 	std::vector<DirectX::XMFLOAT4> pPoints;
 	std::vector<int> pIndices;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;

@@ -1,5 +1,5 @@
 #include "GameComponent.h"
-
+#include <iostream>
 
 TriangleGameComponent::TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT4> points, std::vector<int> indices) : pGame(GameObject), pPoints(points), pIndices(indices)
 {
@@ -61,6 +61,19 @@ void TriangleGameComponent::CreateShadersAndInputLayout()
 	ID3DBlob* errorPixelCode;
 	res = D3DCompileFromFile(L"Shaders.txt", nullptr, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &pPixelShaderByteCode, &errorPixelCode);
 
+	if (FAILED(res)) {
+		// If the shader failed to compile it should have written something to the error message.
+		if (errorVertexCode) {
+			char* compileErrors = (char*)(errorVertexCode->GetBufferPointer());
+
+			std::cout << compileErrors << std::endl;
+		}
+		// If there was  nothing in the error message then it simply could not find the shader file itself.
+		else
+		{
+			MessageBox(*(pGame->GetWindowHandle()), L"MyVeryFirstShader.hlsl", L"Missing Shader File", MB_OK);
+		}
+	}
 
 	pGame->GetDevice()->CreateVertexShader(
 		pVertexShaderByteCode->GetBufferPointer(),
@@ -73,23 +86,23 @@ void TriangleGameComponent::CreateShadersAndInputLayout()
 		nullptr, &pPixelShader);
 
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
-	D3D11_INPUT_ELEMENT_DESC {
-	"POSITION0",
-	0,
-	DXGI_FORMAT_R32G32B32_FLOAT,
-	0,
-	0,
-	D3D11_INPUT_PER_VERTEX_DATA,
-	0},
+		D3D11_INPUT_ELEMENT_DESC {
+		"POSITION",
+		0,
+		DXGI_FORMAT_R32G32B32_FLOAT,
+		0,
+		0,
+		D3D11_INPUT_PER_VERTEX_DATA,
+		0},
 
-	D3D11_INPUT_ELEMENT_DESC {
-	"COLOR0",
-	0,
-	DXGI_FORMAT_R32G32B32A32_FLOAT,
-	0,
-	D3D11_APPEND_ALIGNED_ELEMENT,
-	D3D11_INPUT_PER_VERTEX_DATA,
-	0}
+		D3D11_INPUT_ELEMENT_DESC {
+		"COLOR",
+		0,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
+		0,
+		16,
+		D3D11_INPUT_PER_VERTEX_DATA,
+		0}
 	};
 
 	pGame->GetDevice()->CreateInputLayout(inputElements, 2, pVertexShaderByteCode->GetBufferPointer(), pVertexShaderByteCode->GetBufferSize(), &pInputLayout);
@@ -106,6 +119,39 @@ void TriangleGameComponent::Reload()
 
 void TriangleGameComponent::Update()
 {
+	DirectX::XMFLOAT4 a = DirectX::XMFLOAT4(-1.0f, 0.5f, 0.5f, 1.0f);
+	DirectX::XMFLOAT4 b = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	DirectX::XMFLOAT4 c = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	DirectX::XMFLOAT4 d = DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+	if (first >= 1.0f)
+	{
+		dowm_up = false;
+	}
+	else if(second <= -1.0f)
+	{
+		dowm_up = true;
+	}
+
+	if(dowm_up == true)
+	{
+		first += 0.0065f;
+		second += 0.0065f;
+	}
+	else
+	{
+		first -= 0.0065f;
+		second -= 0.0065f;
+	}
+
+	std::vector<DirectX::XMFLOAT4> points_1 =
+	{
+		DirectX::XMFLOAT4(-0.05f, first, 0.5f, 1.0f),	DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f),
+		DirectX::XMFLOAT4(0.05f, first, 0.5f,1.0f),	DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f),
+		DirectX::XMFLOAT4(-0.05f, second, 0.5f, 1.0f),	DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f),
+		DirectX::XMFLOAT4(0.05f, second, 0.5f, 1.0f),	DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+	};
+	pPoints = points_1;
 }
 
 void TriangleGameComponent::DestroyResources()
