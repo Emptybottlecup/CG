@@ -1,12 +1,16 @@
 #include "Game.h"
+#include <iostream>
+
 Game::Game() : pWindow(pWidth, pHeight)
 {
+	pInput = new InputDevice(this);
 	CreateDeviceAndSwapChain();
 	CreateRenderTargetView();
 }
 
 Game::Game(int Width, int Height) : pWidth(Width), pHeight(Height), pWindow(pWidth, pHeight)
 {
+	pInput = new InputDevice(this);
 	CreateDeviceAndSwapChain();
 	CreateRenderTargetView();
 }
@@ -31,7 +35,7 @@ void Game::CreateDeviceAndSwapChain()
 	swapDesc.SampleDesc.Count = 1;
 	swapDesc.SampleDesc.Quality = 0;
 
-	auto res = D3D11CreateDeviceAndSwapChain(
+	D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -44,11 +48,6 @@ void Game::CreateDeviceAndSwapChain()
 		&pDevice,
 		nullptr,
 		&pDeviceContext);
-
-	if (FAILED(res))
-	{
-		// Well, that was unexpected
-	}
 }
 
 void Game::PushGameComponents(GameComponent* newGameComponent)
@@ -60,37 +59,33 @@ void Game::CreateRenderTargetView()
 	ID3D11Texture2D* colorBuffer;
 	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&colorBuffer);
 	pDevice->CreateRenderTargetView(colorBuffer, nullptr, &pRenderTargetView);
+	if (colorBuffer)
+	{
+		colorBuffer->Release();
+	}
+	D3D11_VIEWPORT viewport = {};
+	viewport.Width = static_cast<float>(pWidth);
+	viewport.Height = static_cast<float>(pHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0;
+	viewport.MaxDepth = 1.0f;
+
+	pDeviceContext->RSSetViewports(1, &viewport);
 }
 
-void Game::CreateInputLayout()
-{
-	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
-	D3D11_INPUT_ELEMENT_DESC {
-		"POSITION",
-		0,
-		DXGI_FORMAT_R32G32B32_FLOAT,
-		0,
-		0,
-		D3D11_INPUT_PER_VERTEX_DATA,
-		0}
-	};
-
-	pDevice->CreateInputLayout(inputElements, 1, pGameComponents[0]->GetVertexShaderByteCode()->GetBufferPointer(), pGameComponents[0]->GetVertexShaderByteCode()->GetBufferSize(), &pInputLayout);
-}
-
-Microsoft::WRL::ComPtr<ID3D11Device> Game::GetDevice()
+ID3D11Device* Game::GetDevice()
 {
 	return pDevice;
 }
 
-Microsoft::WRL::ComPtr<ID3D11DeviceContext> Game::GetDeviceContext()
+ID3D11DeviceContext* Game::GetDeviceContext()
 {
 	return pDeviceContext;
 }
 
 void Game::Run()
 {
-	CreateInputLayout();
 	MSG msg = {};
 	bool isExitRequested = false;
 
@@ -107,27 +102,17 @@ void Game::Run()
 		}
 
 		float clearColor[] = { 0.5, 0.5, 1, 1 };
-		pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), clearColor);
+		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clearColor);
 
-		pDeviceContext->OMSetRenderTargets(1, pRenderTargetView.GetAddressOf(), nullptr);
+		pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
 		for (auto object : pGameComponents)
 		{
 			pDeviceContext->VSSetShader(object->GetVertexShader().Get(), nullptr, 0);
 			pDeviceContext->PSSetShader(object->GetPixelShader().Get(), nullptr, 0);
 
 		}
-		pDeviceContext->IASetInputLayout(pInputLayout.Get());
+		
 		pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		D3D11_VIEWPORT viewport = {};
-		viewport.Width = static_cast<float>(pWidth);
-		viewport.Height = static_cast<float>(pHeight);
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.MinDepth = 0;
-		viewport.MaxDepth = 1.0f;
-
-		pDeviceContext->RSSetViewports(1, &viewport);
 
 		for (auto object : pGameComponents)
 		{
@@ -140,6 +125,22 @@ void Game::Run()
 }
 
 void Game::DeleteResources()
-{
+{	pDeviceContext->Release();
+	pDevice->Release();
+	pSwapChain->Release();
+	pRenderTargetView->Release();
+	for (auto object : pGameComponents)
+	{
+		delete object;
+	};
+}
 
+HWND* Game::GetWindowHandle() 
+{
+	return &(pWindow.GetWindow());
+}
+
+Game::~Game()
+{
+	DeleteResources();
 }

@@ -1,9 +1,9 @@
 #include "GameComponent.h"
 
 
-TriangleGameComponent::TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT3> points, std::vector<int> indices) : pGame(GameObject), pPoints(points), pIndices(indices)
+TriangleGameComponent::TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT4> points, std::vector<int> indices) : pGame(GameObject), pPoints(points), pIndices(indices)
 {
-	CreateShaders();
+	CreateShadersAndInputLayout();
 }
 
 void TriangleGameComponent::Initialize()
@@ -14,7 +14,7 @@ void TriangleGameComponent::Initialize()
 	vertexBufDesc.CPUAccessFlags = 0;
 	vertexBufDesc.MiscFlags = 0;
 	vertexBufDesc.StructureByteStride = 0;
-	vertexBufDesc.ByteWidth = sizeof(DirectX::XMFLOAT3) * std::size(pPoints);
+	vertexBufDesc.ByteWidth = sizeof(DirectX::XMFLOAT4) * std::size(pPoints);
 	D3D11_SUBRESOURCE_DATA vertexData;
 	vertexData.pSysMem = pPoints.data();
 	vertexData.SysMemPitch = 0;
@@ -36,14 +36,16 @@ void TriangleGameComponent::Initialize()
 	ID3D11Buffer* IndexBuffer;
 	pGame->GetDevice()->CreateBuffer(&indexBufDesc, &indexData, &IndexBuffer);
 
-	UINT strides[] = { sizeof(DirectX::XMFLOAT3) };
+	UINT strides[] = { 32 };
 	UINT offsets[] = { 0 };
 
 	pGame->GetDeviceContext()->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	pGame->GetDeviceContext()->IASetVertexBuffers(0, 1, &VertexBuffer, strides, offsets);
+	pGame->GetDeviceContext()->IASetInputLayout(pInputLayout);
+	
 }
 
-void TriangleGameComponent::CreateShaders()
+void TriangleGameComponent::CreateShadersAndInputLayout()
 {
 	ID3DBlob* errorVertexCode = nullptr;
 	auto res = D3DCompileFromFile(L"Shaders.txt",
@@ -70,6 +72,27 @@ void TriangleGameComponent::CreateShaders()
 		pPixelShaderByteCode->GetBufferSize(),
 		nullptr, &pPixelShader);
 
+	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
+	D3D11_INPUT_ELEMENT_DESC {
+	"POSITION0",
+	0,
+	DXGI_FORMAT_R32G32B32_FLOAT,
+	0,
+	0,
+	D3D11_INPUT_PER_VERTEX_DATA,
+	0},
+
+	D3D11_INPUT_ELEMENT_DESC {
+	"COLOR0",
+	0,
+	DXGI_FORMAT_R32G32B32A32_FLOAT,
+	0,
+	D3D11_APPEND_ALIGNED_ELEMENT,
+	D3D11_INPUT_PER_VERTEX_DATA,
+	0}
+	};
+
+	pGame->GetDevice()->CreateInputLayout(inputElements, 2, pVertexShaderByteCode->GetBufferPointer(), pVertexShaderByteCode->GetBufferSize(), &pInputLayout);
 }
 
 void TriangleGameComponent::Draw()
@@ -87,6 +110,16 @@ void TriangleGameComponent::Update()
 
 void TriangleGameComponent::DestroyResources()
 {
+	pVertexShader->Release();
+	pPixelShader->Release();
+	pVertexShaderByteCode->Release();
+	pPixelShaderByteCode->Release();
+	pInputLayout->Release();
 }
 
+TriangleGameComponent::~TriangleGameComponent()
+{
+	pGame = nullptr;
+	DestroyResources();
+}
 

@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include "GameComponent.h"
+#include "InputDevice.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -30,26 +31,27 @@ public:
 
 	void CreateRenderTargetView();
 
-	void CreateInputLayout();
-
 	void PushGameComponents(GameComponent* newGameComponent);
 
-	Microsoft::WRL::ComPtr<ID3D11Device> GetDevice();
+	ID3D11Device* GetDevice();
 
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetDeviceContext();
+	ID3D11DeviceContext* GetDeviceContext();
 
 	void Run();
 
 	void DeleteResources();
 
+	HWND* GetWindowHandle();
+	~Game();
+
 private:
 	int pWidth = 800;
 	int pHeight = 800;
-	std::vector<GameComponent*> pGameComponents;
+	InputDevice* pInput;
 	DisplayWin32 pWindow;
-	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
+	std::vector<GameComponent*> pGameComponents;
+	ID3D11Device* pDevice;
+	ID3D11DeviceContext* pDeviceContext;
+	IDXGISwapChain* pSwapChain;
+	ID3D11RenderTargetView* pRenderTargetView;
 };
