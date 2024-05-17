@@ -1,23 +1,26 @@
 struct vertexIn
 {
-    float3 position : POSITION;
+    float4 position : POSITION;
+    float4 color : COLOR;
 };
 
 struct pixelIn
 {
     float4 position : SV_POSITION;
+    float4 color : COLOR;
 };
 
 
 pixelIn VSMAIN(vertexIn input)
 {
-    pixelIn output;
-    output.position = float4(input.position, 1.0f);
-    
+    pixelIn output = (pixelIn)0;
+    output.position = input.position;
+    output.color = input.color
 	return output;
 }
 
 float4 PSMain(pixelIn input) : SV_TARGET 
 {
-    return float4(1.0, 0.0, 0.0, 1.0);
+    float 4 color = input.color;
+    return color;
 }
