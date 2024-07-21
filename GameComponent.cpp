@@ -1,8 +1,14 @@
 #include "GameComponent.h"
 #include <iostream>
 
-TriangleGameComponent::TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT4> points, std::vector<int> indices) : pGame(GameObject), pPoints(points), pIndices(indices)
+TriangleGameComponent::TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT4> points, std::vector<int> indices, DirectX::XMFLOAT4 offset) : pGame(GameObject), pPoints(points), pIndices(indices)
 {
+	for(int i = 0; i < pPoints.size(); i += 2)
+	{
+		pPoints[i].x += offset.x;
+		pPoints[i].y += offset.y;
+	}
+
 	CreateShadersAndInputLayout();
 }
 
@@ -19,7 +25,7 @@ void TriangleGameComponent::Initialize()
 	vertexData.pSysMem = pPoints.data();
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
-	ID3D11Buffer* VertexBuffer;
+
 	pGame->GetDevice()->CreateBuffer(&vertexBufDesc, &vertexData, &VertexBuffer);
 
 	D3D11_BUFFER_DESC indexBufDesc;
@@ -33,16 +39,9 @@ void TriangleGameComponent::Initialize()
 	indexData.pSysMem = pIndices.data();
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
-	ID3D11Buffer* IndexBuffer;
-	pGame->GetDevice()->CreateBuffer(&indexBufDesc, &indexData, &IndexBuffer);
 
-	UINT strides[] = { 32 };
-	UINT offsets[] = { 0 };
-
-	pGame->GetDeviceContext()->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	pGame->GetDeviceContext()->IASetVertexBuffers(0, 1, &VertexBuffer, strides, offsets);
+	auto hr = pGame->GetDevice()->CreateBuffer(&indexBufDesc, &indexData, &IndexBuffer);;
 	pGame->GetDeviceContext()->IASetInputLayout(pInputLayout);
-	
 }
 
 void TriangleGameComponent::CreateShadersAndInputLayout()
@@ -110,48 +109,16 @@ void TriangleGameComponent::CreateShadersAndInputLayout()
 
 void TriangleGameComponent::Draw()
 {
+	UINT strides[] = { 32 };
+	UINT offsets[] = { 0 };
+	pGame->GetDeviceContext()->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	pGame->GetDeviceContext()->IASetVertexBuffers(0, 1, &VertexBuffer, strides, offsets);
 	pGame->GetDeviceContext()->DrawIndexed(pIndices.size(), 0, 0);
-}
-
-void TriangleGameComponent::Reload()
-{
 }
 
 void TriangleGameComponent::Update()
 {
-	DirectX::XMFLOAT4 a = DirectX::XMFLOAT4(-1.0f, 0.5f, 0.5f, 1.0f);
-	DirectX::XMFLOAT4 b = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	DirectX::XMFLOAT4 c = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	DirectX::XMFLOAT4 d = DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
-	if (first >= 1.0f)
-	{
-		dowm_up = false;
-	}
-	else if(second <= -1.0f)
-	{
-		dowm_up = true;
-	}
-
-	if(dowm_up == true)
-	{
-		first += 0.0065f;
-		second += 0.0065f;
-	}
-	else
-	{
-		first -= 0.0065f;
-		second -= 0.0065f;
-	}
-
-	std::vector<DirectX::XMFLOAT4> points_1 =
-	{
-		DirectX::XMFLOAT4(-0.05f, first, 0.5f, 1.0f),	DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f),
-		DirectX::XMFLOAT4(0.05f, first, 0.5f,1.0f),	DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f),
-		DirectX::XMFLOAT4(-0.05f, second, 0.5f, 1.0f),	DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f),
-		DirectX::XMFLOAT4(0.05f, second, 0.5f, 1.0f),	DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
-	};
-	pPoints = points_1;
 }
 
 void TriangleGameComponent::DestroyResources()

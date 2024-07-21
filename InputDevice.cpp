@@ -43,9 +43,12 @@ void InputDevice::OnKeyDown(KeyboardInputEventArgs args)
 	if (args.MakeCode == 42) key = Keys::LeftShift;
 	if (args.MakeCode == 54) key = Keys::RightShift;
 	
-	if(Break) {
+	if(Break) 
+	{
 		if(keys->count(key))	RemovePressedKey(key);
-	} else {
+	} 
+	else 
+	{	
 		if (!keys->count(key))	AddPressedKey(key);
 	}
 }

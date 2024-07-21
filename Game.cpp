@@ -88,8 +88,11 @@ void Game::Run()
 	MSG msg = {};
 	bool isExitRequested = false;
 	std::chrono::time_point<std::chrono::steady_clock> PrevTime = std::chrono::steady_clock::now();
-	float totalTime = 0;
-	unsigned int frameCount = 0;
+	for (auto object : pGameComponents)
+	{
+		object->Initialize();
+	}
+
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -104,44 +107,24 @@ void Game::Run()
 
 		CreateRenderTargetView();
 
-		float clearColor[] = { totalTime, 0.5, 1, 1 };
+		float clearColor[] = { 0.0, 0.0, 0.0, 1 };
 		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clearColor);
 
 		auto	curTime = std::chrono::steady_clock::now();
-		float	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 1000000.0f;
+		float	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 100000.0f;
 		PrevTime = curTime;
 
-		totalTime += deltaTime;
-		frameCount++;
-
-
 		pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
-		for (auto object : pGameComponents)
-		{
-			pDeviceContext->VSSetShader(object->GetVertexShader().Get(), nullptr, 0);
-			pDeviceContext->PSSetShader(object->GetPixelShader().Get(), nullptr, 0);
 
-		}
-		
+		pDeviceContext->VSSetShader(pGameComponents[0]->GetVertexShader().Get(), nullptr, 0);
+		pDeviceContext->PSSetShader(pGameComponents[0]->GetPixelShader().Get(), nullptr, 0);
+
 		pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		for (auto object : pGameComponents)
 		{
-			object->Initialize();
-			object->Draw();
 			object->Update();
-		}
-
-		if (totalTime > 1.0f) {
-			float fps = frameCount / totalTime;
-
-			totalTime -= 1.0f;
-
-			WCHAR text[256];
-			swprintf_s(text, TEXT("FPS: %f"), fps);
-			SetWindowText(pWindow.GetWindow(), text);
-
-			frameCount = 0;
+			object->Draw();
 		}
 
 		pSwapChain->Present(1, 0);
