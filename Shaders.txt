@@ -13,15 +13,14 @@ struct pixelIn
 
 pixelIn VSMAIN(vertexIn input)
 {
-    pixelIn output = (pixelIn)0;
-
+    pixelIn output;
     output.position = input.position;
     output.color = input.color;
-
 	return output;
 }
 
 float4 PSMain(pixelIn input) : SV_TARGET 
 {
-    return input.color;
+    float4 color = input.color;
+    return color;
 }
