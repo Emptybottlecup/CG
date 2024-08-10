@@ -109,4 +109,36 @@
     <Text Include="2D_Shaders.txt" />
     <Text Include="3D_Shaders.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Earth.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Jupiter.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Mars.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Mercure.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Neptune.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Pluto.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sun.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="TheMoon.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Uranus.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Venus.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

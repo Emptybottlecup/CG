@@ -14,7 +14,7 @@ Game::Game()
 {
 
 }
- 
+
 ID3D11Device* Game::GetDevice()
 {
 	return pDevice;
@@ -105,6 +105,20 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 	if (backBufferTexture) backBufferTexture->Release();
 	pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, 0);
 
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	ZeroMemory(&dsDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	result = pDevice->CreateDepthStencilState(&dsDesc, &pDSState);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to create depth state!\n");
+		return;
+	}
+	pDeviceContext->OMSetDepthStencilState(pDSState, 1);
+
+
 	D3D11_TEXTURE2D_DESC depthTexDesc;
 	ZeroMemory(&depthTexDesc, sizeof(depthTexDesc));
 	depthTexDesc.Width = width;
@@ -136,8 +150,9 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 		OutputDebugString(L"Failed to create depth stencil view!\n");
 		return;
 	}
+	pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, pDepthStencilView);
 
-	D3D11_VIEWPORT viewport;viewport.Width = static_cast<float>(width);
+	D3D11_VIEWPORT viewport; viewport.Width = static_cast<float>(width);
 	viewport.Height = static_cast<float>(height);
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
@@ -167,8 +182,8 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
-	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = false;
 	rasterizerDesc.DepthClipEnable = true;
 	result = pDevice->CreateRasterizerState(&rasterizerDesc, &pRasterizerState);
@@ -221,13 +236,14 @@ void Game::Run()
 		}
 
 		float clearColor[] = { 0.0, 0.0, 0.0, 1 };
+		pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 		pDeviceContext->ClearRenderTargetView(pBackBufferTarget, clearColor);
 
 		auto curTime = std::chrono::steady_clock::now();
 		float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 100000.0f;
 		PrevTime = curTime;
 
-		pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, nullptr);
+		pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, pDepthStencilView);
 
 		pCamera->ProcessTransformPosition(deltaTime);
 

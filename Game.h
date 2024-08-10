@@ -11,11 +11,13 @@
 #include <sstream>
 #include "InputDevice.h"
 #include "Camera.h"
+#include <WICTextureLoader.h>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "DirectXTK.lib")
 
 class GameComponent;
 class GameStick;
@@ -59,9 +61,11 @@ protected:
 
 	ID3D11RenderTargetView* pBackBufferTarget;
 	ID3D11Buffer* pConstantBuffer;
-	ID3D11Texture2D* pDepthTexture;
-	ID3D11DepthStencilView* pDepthStencilView;
 	ID3D11RasterizerState* pRasterizerState;
 
 	std::vector<GameComponent*> pGameComponents;
+
+	ID3D11Texture2D* pDepthTexture;
+	ID3D11DepthStencilView* pDepthStencilView;
+	ID3D11DepthStencilState* pDSState;
 };

@@ -71,7 +71,7 @@ void Cube::Initialize()
 	d3dResult = pGame->GetDevice()->CreateInputLayout(solidColorLayout, totalLayoutElements, vsBuffer->GetBufferPointer(),
 		vsBuffer->GetBufferSize(), &pInputLayout);
 	vsBuffer->Release();
-	if(FAILED(d3dResult))
+	if (FAILED(d3dResult))
 	{
 		return;
 	}

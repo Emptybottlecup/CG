@@ -10,9 +10,18 @@
 struct VertexPos
 {
 	DirectX::XMFLOAT3 Pos;
+	DirectX::XMFLOAT2 TexCoord;
 };
 
 Sphere::Sphere(Game* GameInstance, int radius, int latitudeSegments, int longitudeSegments, Sphere* parent, const DirectX::XMFLOAT3& position, const int speed) : GameComponent(GameInstance), pRadius(radius), pLatitudeSegments(latitudeSegments), pLongitudeSegments(longitudeSegments), pParent(parent), pPosition(position), pSpeed(speed)
+{
+	pScale = { 1.0f, 1.0f, 1.0f };
+	pRotation = { 0.0f, 0.0f, 0.0f };
+	pQuaternion = DirectX::XMQuaternionIdentity();
+	pDistanceFromParent = DirectX::XMVectorZero();
+}
+
+Sphere::Sphere(Game* GameInstance, int radius, int latitudeSegments, int longitudeSegments, Sphere* parent, const DirectX::XMFLOAT3& position, const int speed, const wchar_t* filename) : GameComponent(GameInstance), pRadius(radius), pLatitudeSegments(latitudeSegments), pLongitudeSegments(longitudeSegments), pParent(parent), pPosition(position), pSpeed(speed), pTextureFilename(filename)
 {
 	pScale = { 1.0f, 1.0f, 1.0f };
 	pRotation = { 0.0f, 0.0f, 0.0f };
@@ -34,7 +43,7 @@ void Sphere::Initialize()
 	d3dResult = pGame->GetDevice()->CreateVertexShader(vsBuffer->GetBufferPointer(), vsBuffer->GetBufferSize(), 0, &pVertexShader);
 	if (FAILED(d3dResult))
 	{
-		if(vsBuffer)
+		if (vsBuffer)
 			vsBuffer->Release();
 		return;
 	}
@@ -56,7 +65,8 @@ void Sphere::Initialize()
 
 	D3D11_INPUT_ELEMENT_DESC solidColorLayout[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	unsigned int totalLayoutElements = ARRAYSIZE(solidColorLayout);
 	d3dResult = pGame->GetDevice()->CreateInputLayout(solidColorLayout, totalLayoutElements, vsBuffer->GetBufferPointer(),
@@ -70,13 +80,18 @@ void Sphere::Initialize()
 	std::vector<VertexPos> vertices;
 	for (int lat = 0; lat <= pLatitudeSegments; ++lat) {
 		float phi = M_PI * float(lat) / float(pLatitudeSegments);
+		float v = float(lat) / float(pLatitudeSegments);
+
 		for (int lon = 0; lon <= pLongitudeSegments; ++lon) {
 			float theta = 2 * M_PI * float(lon) / float(pLongitudeSegments);
+			float u = float(lon) / float(pLongitudeSegments);
+
 			DirectX::XMFLOAT3 vertexPos;
 			vertexPos.x = pRadius * sinf(phi) * cosf(theta);
 			vertexPos.y = pRadius * cosf(phi);
 			vertexPos.z = pRadius * sinf(phi) * sinf(theta);
-			VertexPos vertex({vertexPos});
+
+			VertexPos vertex({ vertexPos, {u, v} });
 			vertices.push_back(vertex);
 		}
 	}
@@ -135,12 +150,35 @@ void Sphere::Initialize()
 		DirectX::XMVECTOR parentpos = DirectX::XMLoadFloat3(pParent->GetPosition());
 		pDistanceFromParent = DirectX::XMVectorSubtract(positionVector, parentpos);
 	}
+
+	d3dResult = DirectX::CreateWICTextureFromFile(pGame->GetDevice(), pTextureFilename, nullptr, &pTextureRV);
+	if (FAILED(d3dResult))
+	{
+		OutputDebugString(L"Failed to create texture\n");
+		return;
+	}
+
+	D3D11_SAMPLER_DESC sampDesc = {};
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	d3dResult = pGame->GetDevice()->CreateSamplerState(&sampDesc, &pSamplerLinear);
+	if (FAILED(d3dResult))
+	{
+		OutputDebugString(L"Failed to create sampler\n");
+	}
 }
 
 void Sphere::Update(float deltaTime)
 {
+	pRotation.y += 1.0f * deltaTime * 0.1f;
 	if (pParent)
 	{
+
 		pAngle += 1.0f * deltaTime * pSpeed;
 		DirectX::XMVECTOR rotationAxis = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		pQuaternion = DirectX::XMQuaternionRotationAxis(rotationAxis, DirectX::XMConvertToRadians(pAngle));
@@ -165,6 +203,8 @@ void Sphere::Draw()
 	pGame->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pGame->GetDeviceContext()->VSSetShader(pVertexShader, 0, 0);
 	pGame->GetDeviceContext()->PSSetShader(pPixelShader, 0, 0);
+	pGame->GetDeviceContext()->PSSetShaderResources(0, 1, &pTextureRV);
+	pGame->GetDeviceContext()->PSSetSamplers(0, 1, &pSamplerLinear);
 	DirectX::XMMATRIX WorldMatrix = DirectX::XMMatrixScaling(pScale.x, pScale.y, pScale.z) *
 		DirectX::XMMatrixRotationRollPitchYaw(pRotation.x, pRotation.y, pRotation.z) * DirectX::XMMatrixTranslation(pPosition.x, pPosition.y, pPosition.z);
 	pGame->ChangeConstantBuffer(WorldMatrix, pGame->GetCamera()->GetViewMatrix(), pGame->GetCamera()->GetProjectionMatrix());

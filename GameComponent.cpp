@@ -13,7 +13,7 @@ bool GameComponent::CompileD3DShader(const char* filePath, const char* entry, co
 	int bufferSize = MultiByteToWideChar(CP_ACP, 0, filePath, -1, NULL, 0);
 	WCHAR* wideFilePath = new WCHAR[bufferSize];
 	MultiByteToWideChar(CP_ACP, 0, filePath, -1, wideFilePath, bufferSize);
-	
+
 	result = D3DCompileFromFile(wideFilePath, 0, 0, entry, shaderModel, D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, 0, buffer, &errorBuffer);
 
 	if (FAILED(result))
@@ -39,7 +39,7 @@ void GameComponent::Reload()
 
 TriangleGameComponent::TriangleGameComponent(Game* GameObject, std::vector<DirectX::XMFLOAT4> points, std::vector<int> indices, DirectX::XMFLOAT4 offset) : GameComponent(GameObject), pPoints(points), pIndices(indices)
 {
-	for(int i = 0; i < pPoints.size(); i += 2)
+	for (int i = 0; i < pPoints.size(); i += 2)
 	{
 		pPoints[i].x += offset.x;
 		pPoints[i].y += offset.y;
@@ -62,8 +62,8 @@ void TriangleGameComponent::Initialize()
 
 	if (FAILED(result))
 	{
-		if(VertexShaderByteCode)
-		VertexShaderByteCode->Release();
+		if (VertexShaderByteCode)
+			VertexShaderByteCode->Release();
 
 		return;
 	}

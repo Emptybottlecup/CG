@@ -1,3 +1,6 @@
+Texture2D ObjTexture;
+SamplerState ObjSamplerState;
+
 cbuffer cbMatrix : register( b0 )
 {
 	matrix worldMatrix;
@@ -8,11 +11,13 @@ cbuffer cbMatrix : register( b0 )
 struct VS_Input
 {
 	float4 pos : POSITION;
+	float2 TexCoord : TEXCOORD0;
 };
 
 struct PS_Input
 {
 	float4 pos : SV_POSITION;
+	float2 TexCoord : TEXCOORD0;
 };
 
 PS_Input VS_Main( VS_Input vertex )
@@ -21,10 +26,11 @@ PS_Input VS_Main( VS_Input vertex )
 	vsOut.pos = mul( vertex.pos, worldMatrix );
 	vsOut.pos = mul( vsOut.pos, viewMatrix );
 	vsOut.pos = mul( vsOut.pos, projMatrix );
+	vsOut.TexCoord = vertex.TexCoord;
 	return vsOut;
 }
 
 float4 PS_Main( PS_Input frag ) : SV_TARGET
 {
-	return float4(0,1,0,0);
+	return ObjTexture.Sample(ObjSamplerState, frag.TexCoord);
 }

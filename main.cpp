@@ -5,28 +5,24 @@
 
 int main()
 {
-	DisplayWin32 display(1280,720);
+	DisplayWin32 display(1280, 720);
 	Game* game = new Game();
 	game->Initialize(display.GetHInstance(), display.GetWindow(), display.GetInputDevice());
 
-	Sphere* TheSun = new Sphere(game, 6, 50, 50, nullptr, {0, 0, 0}, 0);
-	Sphere* Mercure = new Sphere(game, 2, 50, 50, TheSun, {-15, 0, 0}, 15);
-	Sphere* Venus = new Sphere(game, 3, 50, 50, TheSun, { -22, 0, 0 }, 12);
-	Sphere* Earth = new Sphere(game, 3, 50, 50, TheSun, { -29, 0, 0 }, 10);
-	Sphere* Mars = new Sphere(game, 2, 50, 50, TheSun, { -36, 0, 0 }, 8);
-	Sphere* Jupiter = new Sphere(game, 4, 50, 50, TheSun, { -50, 0, 0 }, 6);
-	Sphere* Saturn = new Sphere(game, 4, 50, 50, TheSun, { -70,0,0 }, 4);
-	Sphere* Uranus = new Sphere(game, 2, 50, 50, TheSun, { -75,0,0 }, 2);
-	Sphere* Neptune = new Sphere(game, 2, 50, 50, TheSun, { -80,0,0 }, 1);
+	Sphere* TheSun = new Sphere(game, 6, 50, 50, nullptr, { 0, 0, 0 }, 0, L"Sun.jpg");
+	Sphere* Mercure = new Sphere(game, 2, 50, 50, TheSun, { -15, 0, 0 }, 15, L"Mercure.jpg");
+	Sphere* Venus = new Sphere(game, 3, 50, 50, TheSun, { -22, 0, 0 }, 12, L"Venus.jpg");
+	Sphere* Earth = new Sphere(game, 3, 50, 50, TheSun, { -29, 0, 0 }, 10, L"Earth.jpg");
+	Sphere* Mars = new Sphere(game, 2, 50, 50, TheSun, { -36, 0, 0 }, 8, L"Mars.jpg");
+	Sphere* Jupiter = new Sphere(game, 4, 50, 50, TheSun, { -50, 0, 0 }, 6, L"Jupiter.jpg");
+	Sphere* Saturn = new Sphere(game, 4, 50, 50, TheSun, { -70,0,0 }, 4, L"Saturn.jpg");
+	Sphere* Uranus = new Sphere(game, 2, 50, 50, TheSun, { -75,0,0 }, 2, L"Uranus.jpg");
+	Sphere* Neptune = new Sphere(game, 2, 50, 50, TheSun, { -80,0,0 }, 1, L"Neptune.jpg");
+	Sphere* Pluto = new Sphere(game, 1, 50, 50, TheSun, { -90,0,0 }, 1, L"Pluto.jpg");
 
-	Sphere* Moon = new Sphere(game, 1, 50, 50, Earth, { -33,0,0 }, 20);
-	Sphere* Fobos = new Sphere(game, 1, 50, 50, Mars, { -40,0,0 }, 20);
-	Sphere* Deymos = new Sphere(game, 1, 50, 50, Mars, { -43,0,0 }, 15);
-
-
-	Cube* MotherCube = new Cube(game, nullptr, {0,20,0}, {5,5,5}, {0,0,0}, 0);
-	Cube* ChildCube = new Cube(game, MotherCube, {-10,20,0}, {1,1,1}, {0,0,0}, 15);
-
+	Sphere* Moon = new Sphere(game, 1, 50, 50, Earth, { -33,0,0 }, 20, L"TheMoon.jpg");
+	Sphere* Fobos = new Sphere(game, 1, 50, 50, Mars, { -40,0,0 }, 20, L"TheMoon.jpg");
+	Sphere* Deymos = new Sphere(game, 1, 50, 50, Mars, { -43,0,0 }, 15, L"TheMoon.jpg");
 
 	game->PushGameComponents(TheSun);
 	game->PushGameComponents(Mercure);
@@ -40,9 +36,7 @@ int main()
 	game->PushGameComponents(Moon);
 	game->PushGameComponents(Fobos);
 	game->PushGameComponents(Deymos);
-
-	game->PushGameComponents(MotherCube);
-	game->PushGameComponents(ChildCube);
+	game->PushGameComponents(Pluto);
 	game->Run();
 }
 

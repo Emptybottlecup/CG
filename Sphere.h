@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "GameComponent.h"
 
 class Sphere : public GameComponent
@@ -7,6 +6,7 @@ class Sphere : public GameComponent
 public:
 	Sphere(Game* GameInstance, int radius, int latitudeSegments, int longitudeSegments, Sphere* parent, const DirectX::XMFLOAT3& position, const int speed);
 
+	Sphere(Game* GameInstance, int radius, int latitudeSegments, int longitudeSegments, Sphere* parent, const DirectX::XMFLOAT3& position, const int speed, const wchar_t* textureFilename);
 	void Initialize();
 
 	void Update(float deltaTime);
@@ -30,6 +30,10 @@ private:
 	DirectX::XMFLOAT3 pRotation;
 	DirectX::XMFLOAT3 pScale;
 	DirectX::XMVECTOR pQuaternion;
+
+	ID3D11ShaderResourceView* pTextureRV;
+	ID3D11SamplerState* pSamplerLinear;
+	const wchar_t* pTextureFilename;
 
 	int pRadius;
 	int pLatitudeSegments;

@@ -166,6 +166,18 @@
     <Text Include="2D_Shaders.txt" />
     <Text Include="3D_Shaders.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Earth.jpg" />
+    <Image Include="Jupiter.jpg" />
+    <Image Include="Mars.jpg" />
+    <Image Include="Mercure.jpg" />
+    <Image Include="Neptune.jpg" />
+    <Image Include="Pluto.jpg" />
+    <Image Include="Sun.jpg" />
+    <Image Include="TheMoon.jpg" />
+    <Image Include="Uranus.jpg" />
+    <Image Include="Venus.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\Microsoft.XAudio2.Redist.1.2.11\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('packages\Microsoft.XAudio2.Redist.1.2.11\build\native\Microsoft.XAudio2.Redist.targets')" />
