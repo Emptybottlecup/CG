@@ -1,0 +1,33 @@
+﻿  BoxGameComponent.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameBall.h(20,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\dobr0\OneDrive\Desktop\CG\BoxGameComponent.cpp(95,54): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+  Camera.cpp
+  Cube.cpp
+  Game.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameStick.h(28,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+  GameBall.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameBall.h(20,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\dobr0\OneDrive\Desktop\CG\GameBall.cpp(36,31): warning C4244: 'initializing': conversion from 'long double' to 'float', possible loss of data
+  GameComponent.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameComponent.cpp(130,54): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\GameComponent.cpp(152,39): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\GameComponent.cpp(177,54): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+  GameStick.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameStick.h(28,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\dobr0\OneDrive\Desktop\CG\GameBall.h(20,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Pong.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameBall.h(20,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\dobr0\OneDrive\Desktop\CG\GameStick.h(28,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\dobr0\OneDrive\Desktop\CG\Pong.cpp(82,19): warning C4244: '=': conversion from 'WPARAM' to 'USHORT', possible loss of data
+  Sphere.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\Sphere.cpp(15,329): warning C4244: 'initializing': conversion from 'const int' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\Sphere.cpp(72,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\Sphere.cpp(74,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\Sphere.cpp(104,43): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\Sphere.cpp(119,45): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\dobr0\OneDrive\Desktop\CG\Sphere.cpp(130,28): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  main.cpp
+C:\Users\dobr0\OneDrive\Desktop\CG\GameBall.h(20,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Generating Code...
+  LINK : C:\Users\dobr0\OneDrive\Desktop\CG\x64\Debug\CG 1 Laba.exe not found or not built by the last incremental link; performing full link
+  CG 1 Laba.vcxproj -> C:\Users\dobr0\OneDrive\Desktop\CG\x64\Debug\CG 1 Laba.exe

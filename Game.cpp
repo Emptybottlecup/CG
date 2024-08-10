@@ -1,40 +1,81 @@
 #include "Game.h"
 #include <iostream>
 #include <chrono>
+#include "GameStick.h"
 
-Game::Game() : pWindow(pWidth, pHeight)
+struct ConstantBuffer
 {
-	pInput = new InputDevice(this);
-	CreateDeviceAndSwapChain();
+	DirectX::XMMATRIX worldMatrix;
+	DirectX::XMMATRIX viewMatrix;
+	DirectX::XMMATRIX projMatrix;
+};
+
+Game::Game()
+{
+
+}
+ 
+ID3D11Device* Game::GetDevice()
+{
+	return pDevice;
 }
 
-Game::Game(int Width, int Height) : pWidth(Width), pHeight(Height), pWindow(pWidth, pHeight)
+ID3D11DeviceContext* Game::GetDeviceContext()
 {
-	pInput = new InputDevice(this);
-	CreateDeviceAndSwapChain();
+	return pDeviceContext;
 }
 
-void Game::CreateDeviceAndSwapChain()
+IDXGISwapChain* Game::GetSwapChain()
 {
+	return pSwapChain;
+}
+
+HWND& Game::GetWindowHandle()
+{
+	return pWindow;
+}
+
+Camera* Game::GetCamera()
+{
+	return pCamera;
+}
+
+void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
+{
+	phInstance = hInstance;
+	pWindow = hwnd;
+	pInputDevice = InputDevice;
+	pCamera = new Camera(&hwnd, InputDevice);
+
+	RECT dimensions;
+	GetClientRect(hwnd, &dimensions);
+	unsigned int width = dimensions.right - dimensions.left;
+	unsigned int height = dimensions.bottom - dimensions.top;
+
 	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_1 };
+	unsigned int totalFeatureLevels = ARRAYSIZE(featureLevel);
 	DXGI_SWAP_CHAIN_DESC swapDesc;
+	ZeroMemory(&swapDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapDesc.BufferCount = 2;
-	swapDesc.BufferDesc.Width = static_cast<float>(pWidth);
-	swapDesc.BufferDesc.Height = static_cast<float>(pHeight);
+	swapDesc.BufferDesc.Width = width;
+	swapDesc.BufferDesc.Height = height;
 	swapDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapDesc.BufferDesc.RefreshRate.Numerator = 144;
 	swapDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapDesc.OutputWindow = pWindow.GetWindow();
+	swapDesc.OutputWindow = pWindow;
 	swapDesc.Windowed = true;
 	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapDesc.Flags = 0;
 	swapDesc.SampleDesc.Count = 1;
 	swapDesc.SampleDesc.Quality = 0;
 
-	D3D11CreateDeviceAndSwapChain(
+
+	HRESULT result;
+
+	result = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -47,83 +88,152 @@ void Game::CreateDeviceAndSwapChain()
 		&pDevice,
 		nullptr,
 		&pDeviceContext);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to create D3D11 Device!\n");
+		return;
+	}
+
+	ID3D11Texture2D* backBufferTexture;
+	result = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferTexture);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to get back buffer texture!\n");
+		return;
+	}
+	result = pDevice->CreateRenderTargetView(backBufferTexture, 0, &pBackBufferTarget);
+	if (backBufferTexture) backBufferTexture->Release();
+	pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, 0);
+
+	D3D11_TEXTURE2D_DESC depthTexDesc;
+	ZeroMemory(&depthTexDesc, sizeof(depthTexDesc));
+	depthTexDesc.Width = width;
+	depthTexDesc.Height = height;
+	depthTexDesc.MipLevels = 1;
+	depthTexDesc.ArraySize = 1;
+	depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthTexDesc.SampleDesc.Count = 1;
+	depthTexDesc.SampleDesc.Quality = 0;
+	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthTexDesc.CPUAccessFlags = 0;
+	depthTexDesc.MiscFlags = 0;
+	result = pDevice->CreateTexture2D(&depthTexDesc, 0, &pDepthTexture);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to create depth texture!\n");
+		return;
+	}
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	ZeroMemory(&descDSV, sizeof(descDSV));
+	descDSV.Format = depthTexDesc.Format;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+	result = pDevice->CreateDepthStencilView(pDepthTexture, &descDSV, &pDepthStencilView);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to create depth stencil view!\n");
+		return;
+	}
+
+	D3D11_VIEWPORT viewport;viewport.Width = static_cast<float>(width);
+	viewport.Height = static_cast<float>(height);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	pDeviceContext->RSSetViewports(1, &viewport);
+
+	ConstantBuffer constantBufferPoints = { DirectX::XMMatrixIdentity(),DirectX::XMMatrixIdentity() , DirectX::XMMatrixIdentity() };
+	D3D11_BUFFER_DESC constantBufDesc;
+	constantBufDesc.Usage = D3D11_USAGE_DYNAMIC;
+	constantBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	constantBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	constantBufDesc.MiscFlags = 0;
+	constantBufDesc.StructureByteStride = 0;
+	constantBufDesc.ByteWidth = sizeof(ConstantBuffer);
+	D3D11_SUBRESOURCE_DATA constantData;
+	constantData.pSysMem = &constantBufferPoints;
+	constantData.SysMemPitch = 0;
+	constantData.SysMemSlicePitch = 0;
+	result = pDevice->CreateBuffer(&constantBufDesc, &constantData, &pConstantBuffer);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to create constant buffer!\n");
+		return;
+	}
+	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.FrontCounterClockwise = false;
+	rasterizerDesc.DepthClipEnable = true;
+	result = pDevice->CreateRasterizerState(&rasterizerDesc, &pRasterizerState);
+	if (FAILED(result))
+	{
+		OutputDebugString(L"Failed to create rasterizer state!\n");
+		return;
+	}
+	pDeviceContext->RSSetState(pRasterizerState);
 }
 
 void Game::PushGameComponents(GameComponent* newGameComponent)
 {
 	pGameComponents.push_back(newGameComponent);
 }
-void Game::CreateRenderTargetView()
-{
-	ID3D11Texture2D* colorBuffer;
-	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&colorBuffer);
-	pDevice->CreateRenderTargetView(colorBuffer, nullptr, &pRenderTargetView);
-	if (colorBuffer)
-	{
-		colorBuffer->Release();
-	}
-	D3D11_VIEWPORT viewport = {};
-	viewport.Width = static_cast<float>(pWidth);
-	viewport.Height = static_cast<float>(pHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0;
-	viewport.MaxDepth = 1.0f;
 
-	pDeviceContext->RSSetViewports(1, &viewport);
-}
-
-ID3D11Device* Game::GetDevice()
+void Game::ChangeConstantBuffer(DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projMatrix)
 {
-	return pDevice;
-}
+	ConstantBuffer constBuf = { worldMatrix, viewMatrix, projMatrix };
 
-ID3D11DeviceContext* Game::GetDeviceContext()
-{
-	return pDeviceContext;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	memcpy(mappedResource.pData, &constBuf, sizeof(ConstantBuffer));
+	pDeviceContext->Unmap(pConstantBuffer, 0);
 }
 
 void Game::Run()
 {
 	MSG msg = {};
+
 	bool isExitRequested = false;
+
 	std::chrono::time_point<std::chrono::steady_clock> PrevTime = std::chrono::steady_clock::now();
+
 	for (auto object : pGameComponents)
 	{
 		object->Initialize();
 	}
 
 	while (!isExitRequested) {
-		// Handle the windows messages.
+
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 
-		// If windows signals to end the application then exit out.
 		if (msg.message == WM_QUIT) {
 			isExitRequested = true;
 		}
 
-		CreateRenderTargetView();
-
 		float clearColor[] = { 0.0, 0.0, 0.0, 1 };
-		pDeviceContext->ClearRenderTargetView(pRenderTargetView, clearColor);
+		pDeviceContext->ClearRenderTargetView(pBackBufferTarget, clearColor);
 
-		auto	curTime = std::chrono::steady_clock::now();
-		float	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 100000.0f;
+		auto curTime = std::chrono::steady_clock::now();
+		float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 100000.0f;
 		PrevTime = curTime;
 
-		pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
+		pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, nullptr);
 
-		pDeviceContext->VSSetShader(pGameComponents[0]->GetVertexShader().Get(), nullptr, 0);
-		pDeviceContext->PSSetShader(pGameComponents[0]->GetPixelShader().Get(), nullptr, 0);
-
-		pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		pCamera->ProcessTransformPosition(deltaTime);
 
 		for (auto object : pGameComponents)
 		{
-			object->Update();
+			object->Update(deltaTime);
 			object->Draw();
 		}
 
@@ -131,20 +241,26 @@ void Game::Run()
 	}
 }
 
-void Game::DeleteResources()
-{	pDeviceContext->Release();
-	pDevice->Release();
-	pSwapChain->Release();
-	pRenderTargetView->Release();
-	for (auto object : pGameComponents)
-	{
-		delete object;
-	};
-}
 
-HWND* Game::GetWindowHandle() 
+void Game::DeleteResources()
 {
-	return &(pWindow.GetWindow());
+	if (pRasterizerState) pRasterizerState->Release();
+	if (pDepthTexture) pDepthTexture->Release();
+	if (pDepthStencilView) pDepthStencilView->Release();
+	if (pBackBufferTarget) pBackBufferTarget->Release();
+	if (pConstantBuffer) pConstantBuffer->Release();
+	if (pSwapChain) pSwapChain->Release();
+	if (pDeviceContext) pDeviceContext->Release();
+	if (pDevice) pDevice->Release();
+
+	pRasterizerState = 0;
+	pDepthTexture = 0;
+	pDepthStencilView = 0;
+	pDeviceContext = 0;
+	pDevice = 0;
+	pSwapChain = 0;
+	pBackBufferTarget = 0;
+	pConstantBuffer = 0;
 }
 
 Game::~Game()

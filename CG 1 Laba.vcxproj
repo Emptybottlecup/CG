@@ -129,28 +129,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoxGameComponent.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Delegates.cpp" />
     <ClCompile Include="DIsplayWin32.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameBall.cpp" />
     <ClCompile Include="GameComponent.cpp" />
+    <ClCompile Include="GameStick.cpp" />
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Pong.cpp" />
+    <ClCompile Include="Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoxGameComponent.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="Delegates.h" />
     <ClInclude Include="DisplayWin32.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameBall.h" />
     <ClInclude Include="GameComponent.h" />
+    <ClInclude Include="GameStick.h" />
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="Keys.h" />
-    <ClInclude Include="main.h" />
+    <ClInclude Include="Pong.h" />
     <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Shaders.txt" />
+    <ClInclude Include="Sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="2D_Shaders.txt" />
+    <Text Include="3D_Shaders.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

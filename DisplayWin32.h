@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <WinUser.h>
+#include "InputDevice.h"
 
 class DisplayWin32
 {
@@ -20,7 +21,13 @@ public:
 		return phWnd;
 	}
 
+	HINSTANCE& GetHInstance()
+	{
+		return hInstance;
+	}
 	void Release();
+
+	InputDevice* GetInputDevice();
 
 private:
 	void InitWNDCLASSEX();
@@ -28,6 +35,9 @@ private:
 private:
 	int pHeight = 800;
 	int pWidth = 800;
+
+	InputDevice* pInput;
+
 	WNDCLASSEX pWC;
 	HWND phWnd;
 	LPCWSTR applicationName = L"DirectX";

@@ -7,18 +7,19 @@ class Game;
 class GameComponent
 {
 public:
+	GameComponent(Game* GameObject);
+
 	virtual void Initialize() = 0;
+
+	bool CompileD3DShader(const char* filePath, const char* entry, const char* shaderModel, ID3DBlob** buffer);
+
 	virtual void Draw() = 0;
-	virtual void CreateShadersAndInputLayout() = 0;
 	virtual void DestroyResources() = 0;
-	virtual void Update() = 0;
-	virtual Microsoft::WRL::ComPtr<ID3D11VertexShader>& GetVertexShader() = 0;
+	virtual void Update(float deltaTime) = 0;
 
-	virtual Microsoft::WRL::ComPtr<ID3D11PixelShader>& GetPixelShader() = 0;
-
-	virtual Microsoft::WRL::ComPtr<ID3DBlob>& GetVertexShaderByteCode() = 0;
-
-	virtual Microsoft::WRL::ComPtr<ID3DBlob>& GetPixelShaderByteCode() = 0;
+	virtual void Reload();
+protected:
+	Game* pGame;
 };
 
 
@@ -31,51 +32,22 @@ public:
 
 	void Initialize();
 
-	void CreateShadersAndInputLayout();
-
 	void Draw();
 
-	void Update();
+	void Update(float deltaTime);
 
 	void DestroyResources();
 
 	~TriangleGameComponent();
 
-	Microsoft::WRL::ComPtr<ID3D11VertexShader>& GetVertexShader()
-	{
-		return pVertexShader;
-	}
+private:
+	ID3D11VertexShader* pVertexShader;
+	ID3D11PixelShader* pPixelShader;
 
-	Microsoft::WRL::ComPtr<ID3D11PixelShader>& GetPixelShader()
-	{
-		return pPixelShader;
-	}
+	ID3D11InputLayout* pInputLayout;
+	ID3D11Buffer* pVertices;
+	ID3D11Buffer* pIndexBuffer;
 
-	Microsoft::WRL::ComPtr<ID3DBlob>& GetVertexShaderByteCode()
-	{
-		return pVertexShaderByteCode;
-	}
-
-	Microsoft::WRL::ComPtr<ID3DBlob>& GetPixelShaderByteCode()
-	{
-		return pPixelShaderByteCode;
-	}
-
-	Game* GetGame()
-	{
-		return pGame;
-	}
-protected:
 	std::vector<DirectX::XMFLOAT4> pPoints;
 	std::vector<int> pIndices;
-	DirectX::XMFLOAT4 pPosition = { 0.0f, 0.0f, 0.0f, 0.0f };
-	ID3D11Buffer* VertexBuffer;
-	ID3D11Buffer* IndexBuffer;
-	Game* pGame;
-private:
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-	Microsoft::WRL::ComPtr<ID3DBlob> pVertexShaderByteCode;
-	Microsoft::WRL::ComPtr<ID3DBlob> pPixelShaderByteCode;
-	ID3D11InputLayout* pInputLayout;
 };

@@ -9,8 +9,8 @@
 #include "GameComponent.h"
 #include <fstream>
 #include <sstream>
-#include "GameComponent.h"
 #include "InputDevice.h"
+#include "Camera.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -18,6 +18,8 @@
 #pragma comment(lib, "dxguid.lib")
 
 class GameComponent;
+class GameStick;
+class Camera;
 
 class Game
 {
@@ -25,33 +27,41 @@ public:
 
 	Game();
 
-	Game(int Width, int Height);
-
-	void CreateDeviceAndSwapChain();
-
-	void CreateRenderTargetView();
+	void Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice);
 
 	void PushGameComponents(GameComponent* newGameComponent);
 
+	void ChangeConstantBuffer(DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projMatrix);
+
+	virtual void Run();
 	ID3D11Device* GetDevice();
 
 	ID3D11DeviceContext* GetDeviceContext();
 
-	void Run();
+	IDXGISwapChain* GetSwapChain();
+
+	HWND& GetWindowHandle();
+
+	Camera* GetCamera();
 
 	void DeleteResources();
-
-	HWND* GetWindowHandle();
 	~Game();
 
-private:
-	int pWidth = 800;
-	int pHeight = 800;
-	InputDevice* pInput;
-	DisplayWin32 pWindow;
-	std::vector<GameComponent*> pGameComponents;
+protected:
+	HINSTANCE phInstance;
+	HWND pWindow;
+	InputDevice* pInputDevice;
+	Camera* pCamera;
+
 	ID3D11Device* pDevice;
 	ID3D11DeviceContext* pDeviceContext;
 	IDXGISwapChain* pSwapChain;
-	ID3D11RenderTargetView* pRenderTargetView;
+
+	ID3D11RenderTargetView* pBackBufferTarget;
+	ID3D11Buffer* pConstantBuffer;
+	ID3D11Texture2D* pDepthTexture;
+	ID3D11DepthStencilView* pDepthStencilView;
+	ID3D11RasterizerState* pRasterizerState;
+
+	std::vector<GameComponent*> pGameComponents;
 };
