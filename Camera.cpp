@@ -1,5 +1,4 @@
 #include "Camera.h"
-
 #include <iostream>
 
 Camera::Camera(DirectX::XMFLOAT3 startPosition, HWND* hWnd, InputDevice* inputdevice) : phWnd(hWnd), pInput(inputdevice)
@@ -60,7 +59,7 @@ void Camera::ProcessTransformPosition(float deltaTime)
 		// Обновляем углы вращения, ограничивая pitch
 		yaw -= deltaX;
 		pitch -= deltaY;
-		pitch = max(min(pitch, 89.0f), -89.0f); // Исправлено ограничение угла pitch
+		/*pitch = std::max(std::min(pitch, 89.0f), -89.0f); // Исправлено ограничение угла pitch */
 
 		DirectX::XMVECTOR quatYaw = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(yaw));
 

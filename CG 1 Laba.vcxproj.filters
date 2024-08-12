@@ -57,6 +57,9 @@
     <ClCompile Include="Sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -101,6 +104,9 @@
     <ClInclude Include="InputDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -140,5 +146,20 @@
     <Image Include="Venus.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Bear.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Bear_low_02 - Default_AlbedoTransparency.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="HelicopterUV.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="bugatti.obj" />
+    <Object Include="Engine.obj" />
+    <Object Include="Bear.obj" />
+    <Object Include="Helicopter-bl.obj" />
   </ItemGroup>
 </Project>

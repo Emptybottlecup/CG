@@ -1,5 +1,4 @@
 #include "Sphere.h"
-
 #include <cmath>
 #include <iostream>
 

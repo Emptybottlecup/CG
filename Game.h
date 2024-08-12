@@ -13,6 +13,11 @@
 #include "Camera.h"
 #include <WICTextureLoader.h>
 
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -47,6 +52,12 @@ public:
 	Camera* GetCamera();
 
 	void DeleteResources();
+
+	bool LoadModel(const std::string& filename);
+
+	void ProcessNode(aiNode* node, const aiScene* scene);
+
+	GameComponent* ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	~Game();
 
 protected:
