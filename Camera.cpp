@@ -15,6 +15,13 @@ Camera::Camera(DirectX::XMFLOAT3 startPosition, HWND* hWnd, InputDevice* inputde
 	pitch = 0.0f;
 
 	localRotate = DirectX::XMQuaternionIdentity();
+
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	prevx = screenWidth / 2;
+	prevy = screenHeight / 2;
+
 }
 
 Camera::Camera(HWND* hWnd, InputDevice* inputdevice) : phWnd(hWnd), pInput(inputdevice)
@@ -31,6 +38,12 @@ Camera::Camera(HWND* hWnd, InputDevice* inputdevice) : phWnd(hWnd), pInput(input
 	pitch = 0.0f;
 
 	localRotate = DirectX::XMQuaternionIdentity();
+
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	prevx = screenWidth / 2;
+	prevy = screenHeight / 2;
 }
 
 DirectX::XMMATRIX Camera::GetViewMatrix()
@@ -45,25 +58,25 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix()
 
 void Camera::ProcessTransformPosition(float deltaTime)
 {
-	bool leftButton = false;
+		ShowCursor(false);
 
-	if (pInput->IsKeyDown(Keys::LeftButton))
-	{
+
 		pFrontVector = DirectX::XMLoadFloat3(&pFront);
 		pUpVector = DirectX::XMLoadFloat3(&pUp);
 
-		float sensitivity = 0.05f;
-		float deltaX = static_cast<float>(pInput->MousePosition.x - prevx) * sensitivity;
-		float deltaY = static_cast<float>(pInput->MousePosition.y - prevy) * sensitivity;
+		float sensitivity = 0.1f;
 
-		// Обновляем углы вращения, ограничивая pitch
+		POINT cursorPos;
+		GetCursorPos(&cursorPos);
+
+		float deltaX = static_cast<float>(cursorPos.x - prevx) * sensitivity;
+		float deltaY = static_cast<float>(cursorPos.y - prevy) * sensitivity;
+
 		yaw -= deltaX;
 		pitch -= deltaY;
-		/*pitch = std::max(std::min(pitch, 89.0f), -89.0f); // Исправлено ограничение угла pitch */
 
 		DirectX::XMVECTOR quatYaw = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(yaw));
 
-		// Создание кватерниона вращения вокруг оси X для pitch
 		DirectX::XMVECTOR quatPitch = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(pitch));
 
 		localRotate = DirectX::XMQuaternionMultiply(quatPitch, quatYaw);
@@ -72,13 +85,10 @@ void Camera::ProcessTransformPosition(float deltaTime)
 
 		pUpVector = DirectX::XMVector3Rotate(pUpVector, localRotate);
 
-		leftButton = true;
-	}
-
 	DirectX::XMVECTOR right = DirectX::XMVector3Cross(pUpVector, pFrontVector);
 
 	right = DirectX::XMVector3Normalize(right);
-	// Обновление позиции камеры
+
 	if (pInput->IsKeyDown(Keys::W)) {
 	
 		pPositionVector = DirectX::XMVectorAdd(pPositionVector, DirectX::XMVectorScale(pFrontVector, pCameraspeed * deltaTime));
@@ -99,6 +109,12 @@ void Camera::ProcessTransformPosition(float deltaTime)
 		pPositionVector = DirectX::XMVectorSubtract(pPositionVector, DirectX::XMVectorScale(pUpVector, pCameraspeed * deltaTime)); // Исправлено направление для движения вниз
 	}
 
-	prevx = pInput->MousePosition.x;
-	prevy = pInput->MousePosition.y;
+
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	prevx = screenWidth / 2;
+	prevy = screenHeight / 2;
+
+	SetCursorPos(screenWidth / 2, screenHeight / 2);
 }

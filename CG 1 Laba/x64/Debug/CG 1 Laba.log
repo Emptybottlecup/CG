@@ -1,2 +1,8 @@
-﻿  main.cpp
+﻿  Camera.cpp
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(22,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(23,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(45,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(46,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(116,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(117,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
   CG 1 Laba.vcxproj -> C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\x64\Debug\CG 1 Laba.exe

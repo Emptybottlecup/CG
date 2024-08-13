@@ -27,8 +27,8 @@ private:
 	DirectX::XMVECTOR pFrontVector;
 	DirectX::XMVECTOR pUpVector;
 	bool leftbutton = false;
-	float prevx = 1280.0f / 2;
-	float prevy = 800.0f / 2;
+	float prevx;
+	float prevy;
 	float yaw = 0.0f;
 	float pitch = 0.0f;
 	DirectX::XMVECTOR localRotate;
