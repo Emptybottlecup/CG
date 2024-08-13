@@ -53,11 +53,6 @@ public:
 
 	void DeleteResources();
 
-	bool LoadModel(const std::string& filename);
-
-	void ProcessNode(aiNode* node, const aiScene* scene);
-
-	GameComponent* ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	~Game();
 
 protected:

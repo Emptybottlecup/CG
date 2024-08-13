@@ -2,19 +2,12 @@
 #include <iostream>
 #include <chrono>
 #include "GameStick.h"
-#include "Mesh.h"
 
 struct ConstantBuffer
 {
 	DirectX::XMMATRIX worldMatrix;
 	DirectX::XMMATRIX viewMatrix;
 	DirectX::XMMATRIX projMatrix;
-};
-
-struct VertexPos
-{
-	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT2 TexCoord;
 };
 
 Game::Game()
@@ -190,8 +183,8 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = false;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.FrontCounterClockwise = true;
 	rasterizerDesc.DepthClipEnable = true;
 	result = pDevice->CreateRasterizerState(&rasterizerDesc, &pRasterizerState);
 	if (FAILED(result))
@@ -289,70 +282,4 @@ void Game::DeleteResources()
 Game::~Game()
 {
 	DeleteResources();
-}
-
-
-bool Game::LoadModel(const std::string& filename)
-{
-	Assimp::Importer importer;
-
-	const aiScene* pScene = importer.ReadFile(filename, aiProcess_Triangulate);
-
-	if (pScene == NULL)
-	{
-		return false;
-	}
-
-	ProcessNode(pScene->mRootNode, pScene);
-
-	return true;
-}
-
-void Game::ProcessNode(aiNode* node, const aiScene* scene)
-{
-	for (int i = 0; i < node->mNumMeshes; i++)
-	{
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		pGameComponents.push_back(ProcessMesh(mesh, scene));
-	}
-
-	for (int i = 0; i < node->mNumChildren; i++)
-	{
-		ProcessNode(node->mChildren[i], scene);
-	}
-}
-
-GameComponent* Game::ProcessMesh(aiMesh* mesh, const aiScene* scene)
-{
-	std::vector<VertexPos> vertices;
-	std::vector<DWORD> indices;
-
-	for (int i = 0; i < mesh->mNumVertices; i++)
-	{
-		VertexPos vertex;
-
-		vertex.Pos.x = mesh->mVertices[i].x;
-		vertex.Pos.y = mesh->mVertices[i].y;
-		vertex.Pos.z = mesh->mVertices[i].z;
-
-		if (mesh->mTextureCoords[0])
-		{
-			vertex.TexCoord.x = mesh->mTextureCoords[0][i].x;
-			vertex.TexCoord.y = mesh->mTextureCoords[0][i].y;
-		}
-
-		vertices.push_back(vertex);
-	}
-
-	for (int i = 0; i < mesh->mNumFaces; i++)
-	{
-		aiFace face = mesh->mFaces[i];
-
-		for (int j = 0; j < face.mNumIndices; j++)
-		{
-			indices.push_back(face.mIndices[j]);
-		}
-	}
-
-	return new Mesh(this, vertices, indices);
 }

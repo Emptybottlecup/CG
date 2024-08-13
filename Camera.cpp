@@ -19,7 +19,7 @@ Camera::Camera(DirectX::XMFLOAT3 startPosition, HWND* hWnd, InputDevice* inputde
 
 Camera::Camera(HWND* hWnd, InputDevice* inputdevice) : phWnd(hWnd), pInput(inputdevice)
 {
-	pPosition = DirectX::XMFLOAT3(0.0f, 0.0f, -5.0f);
+	pPosition = DirectX::XMFLOAT3(0.0f, 0.0f, -10.0f);
 	pFront = DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f);
 	pUp = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
 

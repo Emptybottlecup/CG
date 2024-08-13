@@ -212,17 +212,21 @@ void Sphere::Draw()
 
 void Sphere::DestroyResources()
 {
-	pVertexShader->Release();
-	pPixelShader->Release();
-	pVertexBuffer->Release();
-	pIndexBuffer->Release();
-	pInputLayout->Release();
+	if (pInputLayout) pInputLayout->Release();
+	if(pTextureRV) pTextureRV->Release();
+	if(pSamplerLinear) pSamplerLinear->Release();
+	if(pVertexShader) pVertexShader->Release();
+	if(pPixelShader) pPixelShader->Release();
+	if(pVertexBuffer) pVertexBuffer->Release();
+	if (pIndexBuffer) pIndexBuffer->Release();
 
 	pVertexShader = 0;
 	pPixelShader = 0;
 	pVertexBuffer = 0;
 	pIndexBuffer = 0;
 	pInputLayout = 0;
+	pTextureRV = 0;
+	pSamplerLinear = 0;
 }
 
 Sphere::~Sphere()

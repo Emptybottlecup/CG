@@ -60,6 +60,9 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -105,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -155,11 +161,20 @@
     <Image Include="HelicopterUV.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="13041_Beagle_diffuse.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Pomeranian_texture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Object Include="bugatti.obj" />
     <Object Include="Engine.obj" />
     <Object Include="Bear.obj" />
     <Object Include="Helicopter-bl.obj" />
+    <Object Include="13041_Beagle_v1_L1.obj" />
+    <Object Include="Pomeranian.obj" />
+    <Object Include="Pomeranian-bl.obj" />
   </ItemGroup>
 </Project>

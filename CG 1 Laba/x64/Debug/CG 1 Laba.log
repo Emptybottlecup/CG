@@ -1,3 +1,2 @@
 ﻿  main.cpp
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\GameBall.h(20,17): warning C4305: 'initializing': truncation from 'double' to 'float'
   CG 1 Laba.vcxproj -> C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\x64\Debug\CG 1 Laba.exe
