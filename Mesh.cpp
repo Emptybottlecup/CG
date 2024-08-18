@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include <iostream>
 
 struct VertexPos
 {

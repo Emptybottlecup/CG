@@ -26,7 +26,7 @@ Camera::Camera(DirectX::XMFLOAT3 startPosition, HWND* hWnd, InputDevice* inputde
 
 Camera::Camera(HWND* hWnd, InputDevice* inputdevice) : phWnd(hWnd), pInput(inputdevice)
 {
-	pPosition = DirectX::XMFLOAT3(0.0f, 0.0f, -10.0f);
+	pPosition = DirectX::XMFLOAT3(0.0f, 0.0f, -100.0f);
 	pFront = DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f);
 	pUp = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
 
@@ -53,37 +53,38 @@ DirectX::XMMATRIX Camera::GetViewMatrix()
 
 DirectX::XMMATRIX Camera::GetProjectionMatrix()
 {
+
 	return DirectX::XMMatrixPerspectiveFovRH(DirectX::XMConvertToRadians(74.0f), 1280.0f / 720.0f, 0.1f, 1000.0f);
 }
 
 void Camera::ProcessTransformPosition(float deltaTime)
 {
-		ShowCursor(false);
+	ShowCursor(false);
 
 
-		pFrontVector = DirectX::XMLoadFloat3(&pFront);
-		pUpVector = DirectX::XMLoadFloat3(&pUp);
+	pFrontVector = DirectX::XMLoadFloat3(&pFront);
+	pUpVector = DirectX::XMLoadFloat3(&pUp);
 
-		float sensitivity = 0.1f;
+	float sensitivity = 0.1f;
 
-		POINT cursorPos;
-		GetCursorPos(&cursorPos);
+	POINT cursorPos;
+	GetCursorPos(&cursorPos);
 
-		float deltaX = static_cast<float>(cursorPos.x - prevx) * sensitivity;
-		float deltaY = static_cast<float>(cursorPos.y - prevy) * sensitivity;
+	float deltaX = static_cast<float>(cursorPos.x - prevx) * sensitivity;
+	float deltaY = static_cast<float>(cursorPos.y - prevy) * sensitivity;
 
-		yaw -= deltaX;
-		pitch -= deltaY;
+	yaw -= deltaX;
+	pitch -= deltaY;
 
-		DirectX::XMVECTOR quatYaw = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(yaw));
+	DirectX::XMVECTOR quatYaw = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(yaw));
 
-		DirectX::XMVECTOR quatPitch = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(pitch));
+	DirectX::XMVECTOR quatPitch = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(pitch));
 
-		localRotate = DirectX::XMQuaternionMultiply(quatPitch, quatYaw);
+	localRotate = DirectX::XMQuaternionMultiply(quatPitch, quatYaw);
 
-		pFrontVector = DirectX::XMVector3Rotate(pFrontVector, localRotate);
+	pFrontVector = DirectX::XMVector3Rotate(pFrontVector, localRotate);
 
-		pUpVector = DirectX::XMVector3Rotate(pUpVector, localRotate);
+	pUpVector = DirectX::XMVector3Rotate(pUpVector, localRotate);
 
 	DirectX::XMVECTOR right = DirectX::XMVector3Cross(pUpVector, pFrontVector);
 

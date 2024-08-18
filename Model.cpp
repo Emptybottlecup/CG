@@ -1,5 +1,4 @@
 #include "Model.h"
-#include <iostream>
 
 struct VertexPos
 {
@@ -9,8 +8,8 @@ struct VertexPos
 Model::Model(Game* GameInstance, const std::string& filename, const wchar_t* textureFilename) : GameComponent(GameInstance), pFilename(filename), pTextureFilename(textureFilename)
 {
 	pPosition = { 0.0f, 0.0f, 0.0f };
-	pScale = { 0.25f, 0.25f, 0.25f };
-	pRotation = { -80.0f, -90.0f, 0.0f };
+	pScale = { 1.0f, 1.0f, 1.0f };
+	pRotation = { 0.0f, 0.0f, 0.0f };
 	pQuaternion = DirectX::XMQuaternionIdentity();
 }
 
@@ -95,8 +94,6 @@ void Model::Initialize()
 	{
 		mesh->Initialize();
 	}
-
-	std::cout << pMeshes.size() << std::endl;
 }
 
 bool Model::LoadModel(const std::string& filename)

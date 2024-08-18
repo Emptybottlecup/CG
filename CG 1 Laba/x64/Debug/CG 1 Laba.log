@@ -1,8 +1,12 @@
-﻿  Camera.cpp
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(22,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(23,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(45,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(46,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(116,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Camera.cpp(117,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+﻿  Mesh.cpp
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Mesh.cpp(22,43): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Mesh.cpp(37,38): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Mesh.cpp(61,54): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+  Model.cpp
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Model.cpp(117,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Model.cpp(123,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Model.cpp(134,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Model.cpp(151,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\Model.cpp(155,21): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
   CG 1 Laba.vcxproj -> C:\Users\dobr0\OneDrive\Documents\GitHub\DirectX11\x64\Debug\CG 1 Laba.exe

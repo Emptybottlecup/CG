@@ -13,8 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{a7dd0326-b6c5-447b-8548-195f9a59c1f5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PongGame">
       <UniqueIdentifier>{48bbe5e8-ce2d-473a-ab3e-338de55b69db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Obj Files">
+      <UniqueIdentifier>{1d5a9ab4-04b5-433d-9160-3027cd23af52}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,9 +104,6 @@
     <ClInclude Include="BoxGameComponent.h">
       <Filter>PongGame</Filter>
     </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,68 +116,35 @@
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="2D_Shaders.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="3D_Shaders.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="BeagleTexture.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SpritzTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Spritz.obj">
+      <Filter>Obj Files</Filter>
+    </Object>
+    <Object Include="Beagle.obj">
+      <Filter>Obj Files</Filter>
+    </Object>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="2D_Shaders.txt" />
-    <Text Include="3D_Shaders.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Earth.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Jupiter.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Mars.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Mercure.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Neptune.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Pluto.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Sun.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="TheMoon.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Uranus.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Venus.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bear.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bear_low_02 - Default_AlbedoTransparency.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="HelicopterUV.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="13041_Beagle_diffuse.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Pomeranian_texture.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="bugatti.obj" />
-    <Object Include="Engine.obj" />
-    <Object Include="Bear.obj" />
-    <Object Include="Helicopter-bl.obj" />
-    <Object Include="13041_Beagle_v1_L1.obj" />
-    <Object Include="Pomeranian.obj" />
-    <Object Include="Pomeranian-bl.obj" />
   </ItemGroup>
 </Project>

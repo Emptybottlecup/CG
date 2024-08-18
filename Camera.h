@@ -26,10 +26,13 @@ private:
 	DirectX::XMVECTOR pPositionVector;
 	DirectX::XMVECTOR pFrontVector;
 	DirectX::XMVECTOR pUpVector;
-	bool leftbutton = false;
+	DirectX::XMVECTOR localRotate;
+
 	float prevx;
 	float prevy;
 	float yaw = 0.0f;
 	float pitch = 0.0f;
-	DirectX::XMVECTOR localRotate;
+
+	float pWidth;
+	float pHeight;
 };

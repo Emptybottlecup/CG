@@ -52,6 +52,8 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 	unsigned int width = dimensions.right - dimensions.left;
 	unsigned int height = dimensions.bottom - dimensions.top;
 
+	
+
 	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_1 };
 	unsigned int totalFeatureLevels = ARRAYSIZE(featureLevel);
 	DXGI_SWAP_CHAIN_DESC swapDesc;
