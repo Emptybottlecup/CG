@@ -1,13 +1,21 @@
 #include "Game.h"
 #include <iostream>
-#include <chrono>
 #include "GameStick.h"
+#include "CharacterBall.h"
+#include "Model.h"
 
 struct ConstantBuffer
 {
 	DirectX::XMMATRIX worldMatrix;
 	DirectX::XMMATRIX viewMatrix;
 	DirectX::XMMATRIX projMatrix;
+
+	DirectX::XMVECTOR LightDirection;
+	DirectX::XMVECTOR LightColor;
+	DirectX::XMVECTOR ViewerPosition;
+	DirectX::XMVECTOR KaSpecPowKsX;
+
+	DirectX::XMMATRIX InverseTransposeWorldMatrix;
 };
 
 Game::Game()
@@ -40,7 +48,64 @@ Camera* Game::GetCamera()
 	return pCamera;
 }
 
-void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
+InputDevice* Game::GetInputDevice()
+{
+	return pInputDevice;
+}
+
+void Game::Draw()
+{
+	std::vector<Model*> collidedModels;
+	for (auto model : pModels)
+	{
+		if (model->GetCollision().Intersects(*pCharacterBall->GetCollision()))
+		{
+			model->SetParent(pCharacterBall);
+			collidedModels.push_back(model);
+		}
+	}
+	for (auto model : collidedModels)
+	{
+		pModels.erase(model);
+	}
+
+	if (pCharacterBall != nullptr)
+	{
+		pCharacterBall->Draw();
+	}
+}
+
+void Game::Update(float deltaTime)
+{
+	if (pCharacterBall != nullptr)
+	{
+		pCharacterBall->Update(deltaTime);
+	}
+	if (pCamera != nullptr)
+	{
+		pCamera->ProcessTransformPosition(deltaTime);
+	}
+
+	for (auto object : pGameComponents)
+	{
+		object->Update(deltaTime);
+		object->Draw();
+	}
+}
+
+void Game::PrepareFrame(std::chrono::time_point<std::chrono::steady_clock>& PrevTime)
+{
+	float clearColor[] = { 0.0, 0.0, 0.0, 1 };
+	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	pDeviceContext->ClearRenderTargetView(pBackBufferTarget, clearColor);
+	pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, pDepthStencilView);
+
+	auto curTime = std::chrono::steady_clock::now();
+	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 1000000.0f;
+	PrevTime = curTime;
+}
+
+void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice, CharacterBall* CharacterBall = nullptr)
 {
 	phInstance = hInstance;
 	pWindow = hwnd;
@@ -51,8 +116,6 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 	GetClientRect(hwnd, &dimensions);
 	unsigned int width = dimensions.right - dimensions.left;
 	unsigned int height = dimensions.bottom - dimensions.top;
-
-	
 
 	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_1 };
 	unsigned int totalFeatureLevels = ARRAYSIZE(featureLevel);
@@ -162,7 +225,8 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 	viewport.TopLeftY = 0.0f;
 	pDeviceContext->RSSetViewports(1, &viewport);
 
-	ConstantBuffer constantBufferPoints = { DirectX::XMMatrixIdentity(),DirectX::XMMatrixIdentity() , DirectX::XMMatrixIdentity() };
+	ConstantBuffer constantBufferPoints = { DirectX::XMMatrixIdentity(),DirectX::XMMatrixIdentity() , DirectX::XMMatrixIdentity(), DirectX::XMVectorZero(),
+	DirectX::XMVectorZero(), DirectX::XMVectorZero()};
 	D3D11_BUFFER_DESC constantBufDesc;
 	constantBufDesc.Usage = D3D11_USAGE_DYNAMIC;
 	constantBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -181,6 +245,7 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 		return;
 	}
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+	pDeviceContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
 
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -195,6 +260,23 @@ void Game::Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice)
 		return;
 	}
 	pDeviceContext->RSSetState(pRasterizerState); 
+
+	if (CharacterBall != nullptr)
+	{
+		pCharacterBall = CharacterBall;
+		pCamera->SetCharacter(pCharacterBall);
+		pCharacterBall->SetCamera(pCamera);
+	}
+
+	for (auto object : pGameComponents)
+	{
+		object->Initialize();
+	}
+
+	if (pCharacterBall != nullptr)
+	{
+		pCharacterBall->Initialize();
+	}
 }
 
 void Game::PushGameComponents(GameComponent* newGameComponent)
@@ -202,9 +284,21 @@ void Game::PushGameComponents(GameComponent* newGameComponent)
 	pGameComponents.push_back(newGameComponent);
 }
 
-void Game::ChangeConstantBuffer(DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projMatrix)
+void Game::PushCollisions(Model* newModel)
 {
-	ConstantBuffer constBuf = { worldMatrix, viewMatrix, projMatrix };
+	pModels.insert(newModel);
+}
+
+void Game::ChangeConstantBuffer(DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projMatrix, DirectX::XMMATRIX InverseTransposeWorldMatrix)
+{
+	DirectX::XMVECTOR lightDirection = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	lightDirection = DirectX::XMVector4Normalize(lightDirection);
+	lightDirection = DirectX::XMVector4Transform(lightDirection, pCamera->GetViewMatrix());
+	lightDirection = DirectX::XMVector4Normalize(lightDirection);
+
+	DirectX::XMVECTOR lightColor = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+	DirectX::XMVECTOR KaSpecPowKsX = DirectX::XMVectorSet(0.4f, 0.5f, 32.0f, 1.0f);
+	ConstantBuffer constBuf = { worldMatrix, viewMatrix, projMatrix,lightDirection, lightColor, pCamera->GetPositionVector(), KaSpecPowKsX, InverseTransposeWorldMatrix };
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -220,11 +314,6 @@ void Game::Run()
 
 	std::chrono::time_point<std::chrono::steady_clock> PrevTime = std::chrono::steady_clock::now();
 
-	for (auto object : pGameComponents)
-	{
-		object->Initialize();
-	}
-
 	while (!isExitRequested) {
 
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -237,24 +326,9 @@ void Game::Run()
 			isExitRequested = true;
 		}
 
-		float clearColor[] = { 0.0, 0.0, 0.0, 1 };
-		pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-		pDeviceContext->ClearRenderTargetView(pBackBufferTarget, clearColor);
-
-		auto curTime = std::chrono::steady_clock::now();
-		float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 100000.0f;
-		PrevTime = curTime;
-
-		pDeviceContext->OMSetRenderTargets(1, &pBackBufferTarget, pDepthStencilView);
-
-		pCamera->ProcessTransformPosition(deltaTime);
-
-		for (auto object : pGameComponents)
-		{
-			object->Update(deltaTime);
-			object->Draw();
-		}
-
+		PrepareFrame(PrevTime);
+		Update(deltaTime);
+		Draw();
 		pSwapChain->Present(1, 0);
 	}
 }

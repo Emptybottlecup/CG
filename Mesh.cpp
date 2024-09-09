@@ -4,11 +4,12 @@ struct VertexPos
 {
 	DirectX::XMFLOAT3 Pos;
 	DirectX::XMFLOAT2 TexCoord;
+	DirectX::XMFLOAT3 Normal;
 };
 
-Mesh::Mesh(Game* GameInstance, std::vector<VertexPos>& vertices, std::vector<DWORD>& indices) : GameComponent(GameInstance), pVertices(vertices), pIndices(indices)
+Mesh::Mesh(Game* GameInstance, std::vector<VertexPos>& vertices, std::vector<DWORD>& indices, std::wstring texturePath) : GameComponent(GameInstance), pVertices(vertices), pIndices(indices), pTexturePath(texturePath)
 {
-
+	
 }
 
 void Mesh::Initialize()
@@ -45,6 +46,11 @@ void Mesh::Initialize()
 		return;
 	}
 
+	if(pTexturePath != L"")
+	{
+		DirectX::CreateWICTextureFromFile(pGame->GetDevice(), pTexturePath.c_str(), nullptr, &pTextureRV);
+	}
+
 }
 
 void Mesh::Update(float deltaTime)
@@ -58,6 +64,7 @@ void Mesh::Draw()
 	unsigned int offset = 0;
 	pGame->GetDeviceContext()->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 	pGame->GetDeviceContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	pGame->GetDeviceContext()->PSSetShaderResources(0, 1, &pTextureRV);
 	pGame->GetDeviceContext()->DrawIndexed(pIndices.size(), 0, 0);
 }
 

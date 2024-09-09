@@ -2,6 +2,9 @@
 #include "Game.h"
 #include "InputDevice.h"
 
+
+class CharacterBall;
+
 class Camera
 {
 public:
@@ -12,27 +15,41 @@ public:
 	DirectX::XMMATRIX GetViewMatrix();
 	DirectX::XMMATRIX GetProjectionMatrix();
 
+	DirectX::XMVECTOR GetPositionVector();
+
+	DirectX::XMVECTOR GetFrontVector();
+
+	DirectX::XMVECTOR GetRightVector();
+
+	float GetCameraSpeed();
 	void ProcessTransformPosition(float deltaTime);
 
+	void SetCharacter(CharacterBall* character);
+
 private:
-	float pCameraspeed = 2.0f;
+	float pCameraspeed = 10.0f;
+	float sensitivity = 0.1f;
 	HWND* phWnd;
 	InputDevice* pInput;
 
 	DirectX::XMFLOAT3 pPosition;
 	DirectX::XMFLOAT3 pFront;
 	DirectX::XMFLOAT3 pUp;
+	DirectX::XMFLOAT3 pRight;
 
 	DirectX::XMVECTOR pPositionVector;
 	DirectX::XMVECTOR pFrontVector;
 	DirectX::XMVECTOR pUpVector;
+	DirectX::XMVECTOR pRightVector;
 	DirectX::XMVECTOR localRotate;
 
-	float prevx;
-	float prevy;
 	float yaw = 0.0f;
 	float pitch = 0.0f;
+	int pWidth;
+	int pHeight;
+	float CenterX = 0;
+	float CenterY = 0;
 
-	float pWidth;
-	float pHeight;
+	CharacterBall* pCharacter = nullptr;
+	DirectX::XMVECTOR pDistanceForCharacter;
 };

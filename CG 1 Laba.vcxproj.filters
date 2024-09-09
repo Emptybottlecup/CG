@@ -13,14 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{a7dd0326-b6c5-447b-8548-195f9a59c1f5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PongGame">
       <UniqueIdentifier>{48bbe5e8-ce2d-473a-ab3e-338de55b69db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Obj Files">
-      <UniqueIdentifier>{1d5a9ab4-04b5-433d-9160-3027cd23af52}</UniqueIdentifier>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{a7dd0326-b6c5-447b-8548-195f9a59c1f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,7 +57,7 @@
     <ClCompile Include="Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sphere.cpp">
+    <ClCompile Include="CharacterBall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
@@ -104,7 +101,7 @@
     <ClInclude Include="BoxGameComponent.h">
       <Filter>PongGame</Filter>
     </ClInclude>
-    <ClInclude Include="Sphere.h">
+    <ClInclude Include="CharacterBall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputDevice.h">
@@ -129,20 +126,9 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="BeagleTexture.jpg">
+    <Image Include="Pluto.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="SpritzTexture.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Spritz.obj">
-      <Filter>Obj Files</Filter>
-    </Object>
-    <Object Include="Beagle.obj">
-      <Filter>Obj Files</Filter>
-    </Object>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

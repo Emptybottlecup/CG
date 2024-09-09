@@ -28,7 +28,7 @@ bool GameComponent::CompileD3DShader(const char* filePath, const char* entry, co
 
 	if (errorBuffer != 0)
 		errorBuffer->Release();
-
+	
 	return true;
 }
 

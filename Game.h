@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <directxmath.h>
+#include <chrono>
 #include <wrl.h>
 #include <stdio.h>
 #include <vector>
@@ -10,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include "InputDevice.h"
+#include <set>
 #include "Camera.h"
 #include <WICTextureLoader.h>
 
@@ -27,6 +29,8 @@
 class GameComponent;
 class GameStick;
 class Camera;
+class CharacterBall;
+class Model;
 
 class Game
 {
@@ -34,13 +38,16 @@ public:
 
 	Game();
 
-	void Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice);
+	void Initialize(HINSTANCE hInstance, HWND hwnd, InputDevice* InputDevice, CharacterBall* CharacterBall);
 
 	void PushGameComponents(GameComponent* newGameComponent);
 
-	void ChangeConstantBuffer(DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projMatrix);
+	void PushCollisions(Model* newModel);
+
+	void ChangeConstantBuffer(DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projMatrix, DirectX::XMMATRIX InverseTransposeWorldMatrix);
 
 	virtual void Run();
+
 	ID3D11Device* GetDevice();
 
 	ID3D11DeviceContext* GetDeviceContext();
@@ -50,6 +57,14 @@ public:
 	HWND& GetWindowHandle();
 
 	Camera* GetCamera();
+
+	InputDevice* GetInputDevice();
+
+	void Draw();
+
+	void Update(float deltaTime);
+
+	void PrepareFrame(std::chrono::time_point<std::chrono::steady_clock>& PrevTime);
 
 	void DeleteResources();
 
@@ -70,8 +85,13 @@ protected:
 	ID3D11RasterizerState* pRasterizerState;
 
 	std::vector<GameComponent*> pGameComponents;
+	std::set<Model*> pModels;
 
 	ID3D11Texture2D* pDepthTexture;
 	ID3D11DepthStencilView* pDepthStencilView;
 	ID3D11DepthStencilState* pDSState;
+
+	CharacterBall* pCharacterBall;
+
+	float deltaTime = 0;
 };

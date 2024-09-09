@@ -180,7 +180,15 @@ void Cube::Draw()
 	pGame->GetDeviceContext()->PSSetShader(pPixelShader, 0, 0);
 	DirectX::XMMATRIX WorldMatrix = DirectX::XMMatrixScaling(pScale.x, pScale.y, pScale.z) *
 		DirectX::XMMatrixRotationRollPitchYaw(pRotation.x, pRotation.y, pRotation.z) * DirectX::XMMatrixTranslation(pPosition.x, pPosition.y, pPosition.z);
-	pGame->ChangeConstantBuffer(WorldMatrix, pGame->GetCamera()->GetViewMatrix(), pGame->GetCamera()->GetProjectionMatrix());
+
+	//ÍÓÆÍÎ ÁÓÄÅÒ ÏÎÌÅÍßÒÜ DirectX::XMMATRIX InvTrWorldView = DirectX::XMMatrixScaling(pScale.x, pScale.y, pScale.z) * rotationMatrix; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	DirectX::XMMATRIX InvTrWorldView = DirectX::XMMatrixScaling(pScale.x, pScale.y, pScale.z);
+	InvTrWorldView = DirectX::XMMatrixInverse(0, InvTrWorldView);
+	InvTrWorldView = DirectX::XMMatrixTranspose(InvTrWorldView);
+	InvTrWorldView = InvTrWorldView * pGame->GetCamera()->GetViewMatrix();
+	pGame->ChangeConstantBuffer(WorldMatrix, pGame->GetCamera()->GetViewMatrix(), pGame->GetCamera()->GetProjectionMatrix(), InvTrWorldView);
+
+
 	pGame->GetDeviceContext()->DrawIndexed(36, 0, 0);
 }
 
